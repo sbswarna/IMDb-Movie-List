@@ -9,14 +9,14 @@ import Pagination from "./common/pagination.component";
 import Filter from "./common/filtering.component";
 
 const Movies = (props) => {
-    const [states, setStates] = useState( {
+    const [states, setStates] = useState({
         movies: [],
         sortColumn: { path: "id", order: "asc" },
         activePage: 1,
         pageCount: 5,
         genres: [],
         selectedGenre: "All Genres",
-    } );
+    });
 
     function setMoviesAndGenres() {
         const movies = getMovies();
@@ -26,23 +26,27 @@ const Movies = (props) => {
 
     useEffect(setMoviesAndGenres, []);
 
+    function changeState(fieldName, updatedState) {
+        setStates((prev) => ({ ...prev, [fieldName]: updatedState }));
+    }
+
     function handleToggleRating(movieRank) {
         const movies = [...states.movies];
         const movie = movies.find((movie) => movie.id === movieRank);
         movie.your_rating = !movie.your_rating;
-        setStates((prev) => ({ ...prev, movies }));
+        changeState("movies", movies);
     }
 
     function handleSort(sortColumn) {
-        setStates((prev) => ({ ...prev, sortColumn }));
+        changeState("sortColumn", sortColumn);
     }
 
     function handleClickPage(activePage) {
-        setStates((prev) => ({ ...prev, activePage }));
+        changeState("activePage", activePage);
     }
 
     function handleClickFilter(selectedGenre) {
-        setStates((prev) => ({ ...prev, selectedGenre }));
+        changeState("selectedGenre", selectedGenre);
     }
 
     function paginateMovies(movies) {
@@ -121,7 +125,7 @@ const Movies = (props) => {
             content: (movie, key) => <td>{movie[key]}</td>,
         },
     ];
-    
+
     return (
         <>
             <div className="container">
