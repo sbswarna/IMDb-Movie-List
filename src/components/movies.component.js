@@ -9,29 +9,29 @@ import Pagination from "./common/pagination.component";
 import Filter from "./common/filtering.component";
 
 const Movies = (props) => {
-    const [states, setStates] = useState({
+    const initialState = {
         movies: [],
         sortColumn: { path: "id", order: "asc" },
         activePage: 1,
         pageCount: 5,
         genres: [],
         selectedGenre: "All Genres",
-    });
+    };
 
-    function setMoviesAndGenres() {
+    const [state, setState] = useState(initialState);
+
+    useEffect(() => {
         const movies = getMovies();
         const genres = ["All Genres", ...getGenres()];
-        setStates((prev) => ({ ...prev, movies, genres }));
-    }
-
-    useEffect(setMoviesAndGenres, []);
+        setState((prev) => ({ ...prev, movies, genres }));
+    }, []);
 
     function changeState(fieldName, updatedState) {
-        setStates((prev) => ({ ...prev, [fieldName]: updatedState }));
+        setState((prev) => ({ ...prev, [fieldName]: updatedState }));
     }
 
     function handleToggleRating(movieRank) {
-        const movies = [...states.movies];
+        const movies = [...state.movies];
         const movie = movies.find((movie) => movie.id === movieRank);
         movie.your_rating = !movie.your_rating;
         changeState("movies", movies);
@@ -50,14 +50,14 @@ const Movies = (props) => {
     }
 
     function paginateMovies(movies) {
-        const { activePage, pageCount } = states;
+        const { activePage, pageCount } = state;
         const start = (activePage - 1) * pageCount;
         const paginatedMovies = movies.slice(start, start + pageCount);
         return paginatedMovies;
     }
 
     function filterMovies() {
-        const { movies, selectedGenre } = states;
+        const { movies, selectedGenre } = state;
         const filteredMovies = movies.filter((movie) => {
             if (selectedGenre === "All Genres") return true;
 
@@ -68,7 +68,7 @@ const Movies = (props) => {
     }
 
     function sortMovies(movies) {
-        const { sortColumn } = states;
+        const { sortColumn } = state;
         const sortedMovies = _.orderBy(
             movies,
             [sortColumn.path],
@@ -131,8 +131,8 @@ const Movies = (props) => {
             <div className="container">
                 <div className="row">
                     <Filter
-                        items={states.genres}
-                        selectedGenre={states.selectedGenre}
+                        items={state.genres}
+                        selectedGenre={state.selectedGenre}
                         onClickFilter={handleClickFilter}
                     />
                     <div className="col-lg-8">
@@ -140,12 +140,12 @@ const Movies = (props) => {
                             items={movies}
                             columns={columns}
                             onSort={handleSort}
-                            sortColumn={states.sortColumn}
+                            sortColumn={state.sortColumn}
                         />
                         <Pagination
                             totalItems={filteredMovies.length}
-                            pageCount={states.pageCount}
-                            activePage={states.activePage}
+                            pageCount={state.pageCount}
+                            activePage={state.activePage}
                             onClickPage={handleClickPage}
                         />
                     </div>
